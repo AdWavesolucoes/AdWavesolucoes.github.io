@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Cinco projetos de IA, cada um com medição e decisão: orquestração com LLM, transcrição distribuída, RAG, estimativa salarial e debate multi-agente.">
+<meta property="og:title" content="Projetos de IA, medidos antes de decididos">
+<meta property="og:description" content="Cinco projetos de IA, cada um com medição e decisão.">
+<title>Projetos de IA medidos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: relatório de bancada. Coluna única de leitura; cada projeto é um "ensaio" com ficha técnica, tabela de medição e decisão. */
+:root {
+  --bg: #f2f1ec;
+  --surface: #e9e8e1;
+  --fg: #22211d;
+  --muted: #67645b;
+  --rule: #d4d1c6;
+  --accent: #4a6849;
+  --accent-soft: #dfe6d9;
+  --bad: #9a4a3a;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a1916; --surface: #23221e; --fg: #e7e3d8; --muted: #a29d90; --rule: #36342e;
+    --accent: #a3bf9f; --accent-soft: #2b3329; --bad: #d48c7a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1a1916; --surface: #23221e; --fg: #e7e3d8; --muted: #a29d90; --rule: #36342e;
+  --accent: #a3bf9f; --accent-soft: #2b3329; --bad: #d48c7a; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { color-scheme: light; }
+@media (prefers-color-scheme: dark) { html { color-scheme: dark; } }
+body { margin: 0; }
+img { max-width: 100%; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 400 1.0625rem/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 46rem; margin: 0 auto; padding-block: 3.5rem 4rem; }
+a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+header { display: grid; gap: 1.1rem; padding-bottom: 2.2rem; border-bottom: 1px solid var(--rule); }
+.who { font: 500 .8rem/1.4 var(--mono); color: var(--muted); letter-spacing: .02em; }
+h1 {
+  font: 800 clamp(2.3rem, 7vw, 3.6rem)/1.02 var(--display);
+  font-stretch: 78%; letter-spacing: -.01em; margin: 0; text-wrap: balance;
+}
+.lede { margin: 0; max-width: 38rem; color: var(--fg); font-size: 1.12rem; }
+.lede em { font-style: normal; color: var(--accent); font-weight: 600; }
+.index { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; margin: .3rem 0 0; padding: 0; list-style: none;
+  font: 500 .85rem/1.4 var(--mono); }
+
+.ensaio { padding-block: 2.6rem; border-bottom: 1px solid var(--rule); display: grid; gap: 1.1rem; }
+.ensaio > * { min-width: 0; }
+.tag { font: 500 .75rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h2 { font: 750 clamp(1.6rem, 4.5vw, 2.1rem)/1.1 var(--display); font-stretch: 85%; margin: 0; text-wrap: balance; }
+h2 a { color: inherit; text-decoration: none; }
+h2 a:hover { color: var(--accent); }
+.repo { font: 400 .85rem/1.4 var(--mono); }
+
+.ficha { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 1px;
+  background: var(--rule); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.ficha div { background: var(--surface); padding: .6rem .75rem; display: grid; gap: .15rem; }
+.ficha dt { font: 500 .68rem/1.2 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.ficha dd { margin: 0; font: 500 .92rem/1.35 var(--body); }
+
+h3 { font: 600 .78rem/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: .4rem 0 -.5rem; }
+p { margin: 0; max-width: 40rem; }
+ul.pts { margin: 0; padding-left: 1.1rem; display: grid; gap: .45rem; max-width: 40rem; }
+
+.tabela { overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; }
+table { border-collapse: collapse; width: 100%; font: 400 .88rem/1.4 var(--body); font-variant-numeric: tabular-nums; }
+th, td { padding: .5rem .75rem; text-align: left; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font: 500 .7rem/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--surface); }
+td.n, th.n { text-align: right; font-family: var(--mono); font-size: .85rem; }
+tr:last-child td { border-bottom: 0; }
+tr.win td { background: var(--accent-soft); }
+tr.win td:first-child { font-weight: 600; }
+.ruim { color: var(--bad); }
+caption { caption-side: bottom; text-align: left; padding: .55rem .75rem; font-size: .8rem; color: var(--muted); border-top: 1px solid var(--rule); white-space: normal; }
+
+.decisao { border-left: 3px solid var(--accent); padding: .2rem 0 .2rem 1rem; display: grid; gap: .3rem; max-width: 40rem; }
+.decisao strong { font: 600 .75rem/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+
+.metodo { padding-top: 2.6rem; display: grid; gap: 1rem; }
+.metodo ol { margin: 0; padding-left: 1.3rem; display: grid; gap: .55rem; max-width: 40rem; }
+footer { padding-top: 2.4rem; font: 400 .82rem/1.6 var(--mono); color: var(--muted); }
+
+@media (max-width: 480px) {
+  body { font-size: 1rem; }
+  .wrap { padding-block: 2.2rem 3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="who">Lucas · Engenharia de Controle e Automação</div>
+    <h1>Projetos de IA, medidos antes de decididos</h1>
+    <p class="lede">Cinco sistemas que construí e rodo no meu servidor doméstico. Todos têm a mesma regra: <em>a decisão sai de uma medição, e não do que "deveria" funcionar</em>. Em três deles, a medição contrariou o que eu esperava.</p>
+    <ul class="index">
+      <li><a href="#orq-bench">orq-bench</a></li>
+      <li><a href="#estudo-worker">estudo-worker</a></li>
+      <li><a href="#vault-rag">vault-rag</a></li>
+      <li><a href="#trainee-radar">trainee-radar</a></li>
+      <li><a href="#conselho-ia">conselho-ia</a></li>
+    </ul>
+  </header>
+
+  <section class="ensaio" id="orq-bench">
+    <span class="tag">Avaliação de LLM · agentes</span>
+    <h2><a href="https://github.com/AdWavesolucoes/orq-bench">Um modelo de 4B serve para orquestrar ferramentas?</a></h2>
+    <a class="repo" href="https://github.com/AdWavesolucoes/orq-bench">github.com/AdWavesolucoes/orq-bench</a>
+    <dl class="ficha">
+      <div><dt>Amostra</dt><dd>45 casos em PT-BR</dd></div>
+      <div><dt>Ferramentas</dt><dd>13 do homelab</dd></div>
+      <div><dt>Correção</dt><dd>determinística</dd></div>
+      <div><dt>Modos</dt><dd>nativo × schema</dd></div>
+    </dl>
+    <h3>Problema</h3>
+    <p>Eu queria um modelo local, rodando numa GPU de consumo, que recebesse um pedido em português e escolhesse a ferramenta certa do servidor. Antes de pensar em fine-tuning, precisava saber onde os modelos pequenos realmente falham.</p>
+    <h3>Medição</h3>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Modelo</th><th class="n">Geral</th><th class="n">Roteamento</th><th class="n">Ambíguo</th><th class="n">Arriscado</th></tr></thead>
+        <tbody>
+          <tr class="win"><td>qwen3.5 4B (schema)</td><td class="n">36/45 · 80%</td><td class="n">10/10</td><td class="n ruim">2/5</td><td class="n ruim">1/2</td></tr>
+          <tr><td>phi4-mini 3.8B (schema)</td><td class="n">31/45 · 69%</td><td class="n">8/10</td><td class="n">3/5</td><td class="n">2/2</td></tr>
+          <tr><td>phi4-mini 3.8B (nativo)</td><td class="n ruim">6/45 · 13%</td><td class="n">0/10</td><td class="n">0/5</td><td class="n">0/2</td></tr>
+          <tr><td>llama3.2 3B (schema)</td><td class="n">29/45 · 64%</td><td class="n">8/10</td><td class="n">1/5</td><td class="n">1/2</td></tr>
+        </tbody>
+        <caption>Mesmos 45 casos, mesma GPU (RX 5700 XT). "Schema" é a decodificação restrita a JSON válido.</caption>
+      </table>
+    </div>
+    <ul class="pts">
+      <li>A decodificação restrita levou o phi4-mini de 13% para 69% sem trocar o modelo.</li>
+      <li>Endurecer o prompt com regras de ambiguidade e exemplos rendeu só +1 caso, e piorou a categoria "sem ferramenta".</li>
+    </ul>
+    <div class="decisao"><strong>Conclusão</strong><p>O gargalo não é escolher a ferramenta, onde o modelo acertou 10/10. É saber a hora de <em>não agir</em>: metade das falhas é chutar uma ferramenta em vez de perguntar. Isso justifica um fine-tuning estreito (LoRA para ambiguidade e gatilho), e não "treinar um orquestrador".</p></div>
+  </section>
+
+  <section class="ensaio" id="estudo-worker">
+    <span class="tag">Pipeline de dados · inferência distribuída</span>
+    <h2><a href="https://github.com/AdWavesolucoes/estudo-worker">1.766 aulas transcritas com quatro tipos de hardware e um teto de gasto</a></h2>
+    <a class="repo" href="https://github.com/AdWavesolucoes/estudo-worker">github.com/AdWavesolucoes/estudo-worker</a>
+    <dl class="ficha">
+      <div><dt>Fila</dt><dd>1.766 aulas + ~12 mil PDFs</dd></div>
+      <div><dt>Recursos</dt><dd>CPU · Arc A310 · RX 5700 XT · nuvem</dd></div>
+      <div><dt>Métrica</dt><dd>RTF e concordância</dd></div>
+      <div><dt>Custo da nuvem</dt><dd>US$ 6,64</dd></div>
+    </dl>
+    <h3>Problema</h3>
+    <p>Uma plataforma de estudos precisava de transcrição, OCR e classificação por assunto para um acervo grande de vídeo-aulas e PDFs. Só com a CPU do servidor, a fila levaria cerca de 13 dias.</p>
+    <h3>O que construí</h3>
+    <ul class="pts">
+      <li>Workers que falam com o app só por HTTP e token, um por recurso, com a mesma imagem. O app garante que dois workers nunca pegam o mesmo job.</li>
+      <li>Roteamento com fallback: a GPU do PC quando está ligada, depois modelo gratuito na nuvem, depois os baratos. Um 429 deixa o modelo "de castigo" e há teto de gasto diário.</li>
+      <li>Máquina desligada não conta como falha: o job volta para a fila sem gastar tentativa.</li>
+      <li>Um braço remoto por SSH, que roda o whisper.cpp com Vulkan cross-compilado para Windows na GPU AMD do PC.</li>
+    </ul>
+    <h3>Medição</h3>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Backend (Whisper large-v3-turbo)</th><th class="n">RTF</th><th>Resultado</th></tr></thead>
+        <tbody>
+          <tr><td>faster-whisper INT8, CPU i7-4770</td><td class="n">2,47</td><td>estável, base da fila</td></tr>
+          <tr><td>OpenVINO INT8, Arc A310</td><td class="n">6,2–11,2</td><td class="ruim">trava o driver em carga longa</td></tr>
+          <tr class="win"><td>whisper.cpp Vulkan, RX 5700 XT</td><td class="n">9,0</td><td>99,1% igual à CPU</td></tr>
+          <tr><td>Gemini Flash-Lite, pedaços de 30 s</td><td class="n">~85</td><td>95,4% · US$ 0,0098 / 10 min</td></tr>
+        </tbody>
+        <caption>RTF = segundos de áudio por segundo de processamento. Amostra de 10 min; concordância medida contra a transcrição da CPU.</caption>
+      </table>
+    </div>
+    <div class="decisao"><strong>Decisão</strong><p>A GPU Intel era até 4,5 vezes mais rápida e ficou fora da transcrição, porque travou duas vezes e a fila roda dias sem supervisão. Na nuvem, mandar a aula inteira devolvia texto bom com os tempos errados, então cada pedaço de 30 s vira um pedido. Com isso, 999 aulas saíram numa noite, sem nenhum job em erro.</p></div>
+  </section>
+
+  <section class="ensaio" id="vault-rag">
+    <span class="tag">RAG · avaliação</span>
+    <h2><a href="https://github.com/AdWavesolucoes/vault-rag">O RAG ganhou nos números e eu não adotei</a></h2>
+    <a class="repo" href="https://github.com/AdWavesolucoes/vault-rag">github.com/AdWavesolucoes/vault-rag</a>
+    <dl class="ficha">
+      <div><dt>Corpus</dt><dd>249 notas · 2.805 chunks</dd></div>
+      <div><dt>Embedding</dt><dd>bge-m3 local</dd></div>
+      <div><dt>Eixos</dt><dd>recall · acerto · alucinação · tokens</dd></div>
+      <div><dt>Baseline</dt><dd>grep</dd></div>
+    </dl>
+    <h3>Problema</h3>
+    <p>A documentação do meu servidor fica num vault Obsidian. Valia colocar busca semântica na frente dela, para mim e para um agente de código?</p>
+    <h3>Medição</h3>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Estratégia</th><th class="n">Tokens / consulta</th><th class="n">Achou o arquivo</th></tr></thead>
+        <tbody>
+          <tr><td>grep + ler a nota</td><td class="n">7.767</td><td class="n">4/8</td></tr>
+          <tr class="win"><td>busca vetorial, só as fontes</td><td class="n">213</td><td class="n">7/8</td></tr>
+          <tr><td>modelo local de 1,5B responde</td><td class="n">0</td><td class="n">acerto 90%</td></tr>
+        </tbody>
+        <caption>Vault real. Nenhum dos modelos inventou resposta nos casos sem resposta (0/3).</caption>
+      </table>
+    </div>
+    <p>Uma pergunta virou o jogo: "o serviço X está rodando?". A nota corrigida dizia <strong>DESCOMISSIONADO</strong> e veio em 1º lugar na busca. O modelo de 1,5B respondeu "sim, está rodando", porque três sessões antigas descreviam o serviço funcionando. Histórico abundante vence a correção pontual.</p>
+    <div class="decisao"><strong>Decisão</strong><p>Não adotei, porque errar com confiança é pior que não achar. Pergunta sobre estado vai para uma verificação ao vivo (ping, dig, docker), e não para um modelo lendo texto. O repositório traz um vault fictício que reproduz essa armadilha. Rodando o eval nele, apareceu um bug do chunker que descartava parágrafos curtos, e o modelo de 7B subiu de 9/12 para 11/12 depois do conserto.</p></div>
+  </section>
+
+  <section class="ensaio" id="trainee-radar">
+    <span class="tag">Produto · extração com LLM</span>
+    <h2><a href="https://github.com/AdWavesolucoes/trainee-radar">Onde a IA entrou na estimativa de salário, e onde ela perdeu</a></h2>
+    <a class="repo" href="https://github.com/AdWavesolucoes/trainee-radar">github.com/AdWavesolucoes/trainee-radar</a>
+    <dl class="ficha">
+      <div><dt>Fontes</dt><dd>7 sites de vagas</dd></div>
+      <div><dt>Banco</dt><dd>~7 mil vagas</dd></div>
+      <div><dt>Validação</dt><dd>leave-one-out</dd></div>
+      <div><dt>Interface</dt><dd>Flask + SSE · Telegram</dd></div>
+    </dl>
+    <h3>Problema</h3>
+    <p>Monitorar vagas de trainee e júnior em sete fontes, pontuá-las contra um perfil e estimar o salário de vagas que não publicam salário, que são a maioria.</p>
+    <h3>Medição</h3>
+    <div class="tabela">
+      <table>
+        <thead><tr><th>Quem dá o número</th><th class="n">Faixa exata</th><th class="n">MdAPE</th><th class="n">Descartou</th></tr></thead>
+        <tbody>
+          <tr><td>LLM (qwen3) lendo a vaga</td><td class="n">58%</td><td class="n">14,6%</td><td class="n ruim">12 de 38</td></tr>
+          <tr class="win"><td>Mediana de vagas parecidas</td><td class="n">62%</td><td class="n">16,0%</td><td class="n">0</td></tr>
+        </tbody>
+        <caption>40 vagas técnicas com salário conhecido, cada uma estimada sem ver o próprio salário. Regra de decisão escrita antes da rodada.</caption>
+      </table>
+    </div>
+    <div class="decisao"><strong>Decisão</strong><p>O número final vem da mediana, e a IA ficou com o que faz bem: extrair os requisitos e explicar a faixa. Na extração via API, uma regra barra a alucinação: se o modelo diz que o salário está escrito no anúncio, a citação precisa ser um trecho literal da descrição. Se não for, a resposta inteira é descartada.</p></div>
+  </section>
+
+  <section class="ensaio" id="conselho-ia">
+    <span class="tag">Multi-agente</span>
+    <h2><a href="https://github.com/AdWavesolucoes/conselho-ia">Conselho de IA: três modelos debatem, um quarto julga</a></h2>
+    <a class="repo" href="https://github.com/AdWavesolucoes/conselho-ia">github.com/AdWavesolucoes/conselho-ia</a>
+    <p>Uma pergunta difícil vai para três LLMs com papéis fixos: quem propõe, quem critica e quem puxa para o lado prático. Eles debatem por algumas rodadas, e um modelo mais forte escreve o consenso, as divergências e um veredito com nota. Funciona com vários provedores (Anthropic, OpenAI, OpenRouter, Ollama), tem streaming no terminal e no navegador e mostra o custo em tokens por membro. Usei o conselho em decisões de infraestrutura do servidor.</p>
+  </section>
+
+  <section class="metodo">
+    <span class="tag">Como trabalho</span>
+    <ol>
+      <li>Escrevo o critério de decisão antes de medir, para o resultado não escolher a regra.</li>
+      <li>Comparo com o baseline mais simples (grep, mediana, CPU) antes de adotar o mais sofisticado.</li>
+      <li>Documento por que cada perdedor perdeu, para não testar de novo.</li>
+      <li>Trato a falha silenciosa como a pior falha: a GPU que corrompe vetores sem erro no log, o RAG que erra com confiança, o LLM que inventa um salário plausível.</li>
+    </ol>
+  </section>
+
+  <footer>
+    Código: <a href="https://github.com/AdWavesolucoes">github.com/AdWavesolucoes</a> · Python, Docker, SQLite, Ollama, OpenRouter, Flask, faster-whisper, OpenVINO, whisper.cpp
+  </footer>
+</div>
+</body>
+</html>
